@@ -16,6 +16,8 @@ import org.enthusia.teleport.config.PluginConfig;
 /** Main-thread UI adapter. Never writes protection state or the shared action bar. */
 @SuppressWarnings("PMD.UseConcurrentHashMap") // TaskCoordinator and Paper events access this only on the main thread.
 public final class NewcomerRtpNotice implements Listener {
+    private static final long SECONDS_PER_MINUTE = 60L;
+    private static final long SECONDS_PER_HOUR = 3600L;
     private final EnthusiaTeleportPlugin plugin;
     private final Map<UUID, Display> displays = new java.util.HashMap<>();
 
@@ -81,8 +83,8 @@ public final class NewcomerRtpNotice implements Listener {
     private String remainingTime(PluginConfig.NewcomerRtpSettings newcomer, long first, long now) {
         long millis = newcomer.windowSeconds() * 1000L - (now - first);
         long seconds = millis / 1000L + (millis % 1000L == 0 ? 0 : 1);
-        if (seconds >= 3600) return (seconds / 3600) + "h " + ((seconds % 3600) / 60) + "m";
-        if (seconds >= 60) return (seconds / 60) + "m " + (seconds % 60) + "s";
+        if (seconds >= SECONDS_PER_HOUR) return (seconds / SECONDS_PER_HOUR) + "h " + ((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE) + "m";
+        if (seconds >= SECONDS_PER_MINUTE) return (seconds / SECONDS_PER_MINUTE) + "m " + (seconds % SECONDS_PER_MINUTE) + "s";
         return seconds + "s";
     }
 

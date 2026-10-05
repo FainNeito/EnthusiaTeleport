@@ -35,3 +35,9 @@ Project-local EARS/state tools are absent; no automated SPEAR-tool result is cla
 The monorepo owns release builds through plugins/enthusia-teleport. Its pin must be updated through a separate normal PR after canonical merge, with combined checks and clean merged-source build evidence before any authorized production upload. No pin, deployment, reload, restart, merge, player communication or automation was performed here.
 
 Fresh-account first-play timestamps, effective permissions, queue/warmup runtime behavior, failed/cancelled teleports, expiry/rollback and Java/Bedrock player journeys remain explicit runtime acceptance gates in docs/retention-pilot.md. Local checks do not establish retention improvement.
+
+## Four-finding review follow-up (2026-10-05)
+
+Codacy on dd254f4 reported two time-format numeric conditional warnings and duplicate permission/warzone test strings. Named constants preserve identical arithmetic, display text, permission and region values. Existing behavioral tests provide regression coverage; no new behavioral requirement or historical red test is claimed for constant extraction. Maven 3.9.11/JDK 23 clean verify passes 41 tests with zero failures/errors/skips (codacy-four-verify.log). git diff --check passed. Latest unmerged/local test artifact SHA-256: C98487A16A1582D7403B0642F8CD8E1929400AD8769E0B4865BD54742144CAA4.
+
+Attempted approval of canonical Teleport runs 37377879440/37377879459 and Hub run 37377379359 with explicit user authorization; GitHub returned 403, repository admin rights required. Hosted CI has no executed jobs; it is not a test failure or successful verification. New-head Codacy reanalysis and administrator CI approval remain pending. No merge or production action.

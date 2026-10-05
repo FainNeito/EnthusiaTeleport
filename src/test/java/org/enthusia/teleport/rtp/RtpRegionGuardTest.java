@@ -15,12 +15,13 @@ import org.enthusia.teleport.EnthusiaTeleportPlugin;
 import org.junit.jupiter.api.Test;
 
 final class RtpRegionGuardTest {
+    private static final String WARZONE = "warzone";
     private static final String MARKET = "market";
-    private final List<String> ids = List.of("warzone", "spawn", MARKET);
+    private final List<String> ids = List.of(WARZONE, "spawn", MARKET);
 
     private RegionManager regions() {
         var manager = mock(RegionManager.class);
-        when(manager.getRegion("warzone")).thenReturn(new ProtectedCuboidRegion("warzone",
+        when(manager.getRegion(WARZONE)).thenReturn(new ProtectedCuboidRegion(WARZONE,
                 BlockVector3.at(-219, -64, -405), BlockVector3.at(219, 319, 189)));
         when(manager.getRegion("spawn")).thenReturn(new ProtectedCuboidRegion("spawn",
                 BlockVector3.at(-49, 78, -34), BlockVector3.at(69, 319, 84)));
@@ -43,7 +44,7 @@ final class RtpRegionGuardTest {
     @Test
     void liveResizeAndSeparateRegionShapesAreAppliedWithoutPriorityBypass() {
         var manager = regions();
-        when(manager.getRegion("warzone")).thenReturn(new ProtectedCuboidRegion("warzone",
+        when(manager.getRegion(WARZONE)).thenReturn(new ProtectedCuboidRegion(WARZONE,
                 BlockVector3.at(1000, -64, 1000), BlockVector3.at(1100, 319, 1100)));
         assertFalse(RtpRegionGuard.allows(manager, new Location(null, 0, 100, 0), ids));
         assertFalse(RtpRegionGuard.allows(manager, new Location(null, 80, 120, -200), ids));

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 final class NewcomerRtpNoticeTest {
+    private static final String RTP_PERMISSION = "enthusia.teleport.rtp";
     private static final long FIRST = 1_000_000L;
     private NewcomerRtpNotice notice;
     private PluginConfig.RtpSettings settings;
@@ -43,7 +44,7 @@ final class NewcomerRtpNoticeTest {
         when(player.getUniqueId()).thenReturn(UUID.randomUUID());
         when(player.getFirstPlayed()).thenReturn(FIRST);
         when(player.isOnline()).thenReturn(true);
-        when(player.hasPermission("enthusia.teleport.rtp")).thenReturn(true);
+        when(player.hasPermission(RTP_PERMISSION)).thenReturn(true);
         when(rtp.getLimit(player)).thenReturn(3);
         notice = new NewcomerRtpNotice(plugin);
     }
@@ -82,10 +83,10 @@ final class NewcomerRtpNoticeTest {
     @Test
     void permissionLossAndExactExpiryRemoveBar() {
         notice.refresh(player, FIRST);
-        when(player.hasPermission("enthusia.teleport.rtp")).thenReturn(false);
+        when(player.hasPermission(RTP_PERMISSION)).thenReturn(false);
         notice.refresh(player, FIRST + 1);
         verify(player).hideBossBar(any());
-        when(player.hasPermission("enthusia.teleport.rtp")).thenReturn(true);
+        when(player.hasPermission(RTP_PERMISSION)).thenReturn(true);
         notice.refresh(player, FIRST + 86_399_999L);
         var capture = ArgumentCaptor.forClass(BossBar.class);
         verify(player, times(2)).showBossBar(capture.capture());
@@ -138,7 +139,7 @@ final class NewcomerRtpNoticeTest {
         when(rejoined.getUniqueId()).thenReturn(id);
         when(rejoined.getFirstPlayed()).thenReturn(FIRST);
         when(rejoined.isOnline()).thenReturn(true);
-        when(rejoined.hasPermission("enthusia.teleport.rtp")).thenReturn(true);
+        when(rejoined.hasPermission(RTP_PERMISSION)).thenReturn(true);
         when(rtp.getLimit(rejoined)).thenReturn(3);
         notice.refresh(rejoined, FIRST + 1);
         verify(player).hideBossBar(oldBar.getValue());
