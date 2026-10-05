@@ -73,6 +73,8 @@ public record PluginConfig(
             SafetySettings safety,
             NewcomerRtpSettings newcomer
     ) {
+        // Retained binary/source compatibility constructor; replacing it would break existing callers.
+        @SuppressWarnings("PMD.ExcessiveParameterList")
         public RtpSettings(boolean enabled, String world, int minX, int maxX, int minZ, int maxZ,
                            int maxUsesDefault, Map<String, Integer> rankLimits, int maxAttempts,
                            QueueSettings queue, SpacingSettings spacing, SafetySettings safety) {

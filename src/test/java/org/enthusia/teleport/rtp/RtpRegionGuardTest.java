@@ -15,7 +15,8 @@ import org.enthusia.teleport.EnthusiaTeleportPlugin;
 import org.junit.jupiter.api.Test;
 
 final class RtpRegionGuardTest {
-    private final List<String> ids = List.of("warzone", "spawn", "market");
+    private static final String MARKET = "market";
+    private final List<String> ids = List.of("warzone", "spawn", MARKET);
 
     private RegionManager regions() {
         var manager = mock(RegionManager.class);
@@ -23,7 +24,7 @@ final class RtpRegionGuardTest {
                 BlockVector3.at(-219, -64, -405), BlockVector3.at(219, 319, 189)));
         when(manager.getRegion("spawn")).thenReturn(new ProtectedCuboidRegion("spawn",
                 BlockVector3.at(-49, 78, -34), BlockVector3.at(69, 319, 84)));
-        when(manager.getRegion("market")).thenReturn(new ProtectedCuboidRegion("market",
+        when(manager.getRegion(MARKET)).thenReturn(new ProtectedCuboidRegion(MARKET,
                 BlockVector3.at(-73, -64, -282), BlockVector3.at(102, 319, -163)));
         return manager;
     }
@@ -55,7 +56,7 @@ final class RtpRegionGuardTest {
         var point = new Location(null, 300, 100, 300);
         assertFalse(RtpRegionGuard.allows(null, point, ids));
         var manager = regions();
-        when(manager.getRegion("market")).thenReturn(null);
+        when(manager.getRegion(MARKET)).thenReturn(null);
         assertFalse(RtpRegionGuard.allows(manager, point, ids));
     }
 

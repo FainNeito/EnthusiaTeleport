@@ -1,6 +1,5 @@
 package org.enthusia.teleport.rtp;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
@@ -15,9 +14,10 @@ import org.enthusia.teleport.EnthusiaTeleportPlugin;
 import org.enthusia.teleport.config.PluginConfig;
 
 /** Main-thread UI adapter. Never writes protection state or the shared action bar. */
+@SuppressWarnings("PMD.UseConcurrentHashMap") // TaskCoordinator and Paper events access this only on the main thread.
 public final class NewcomerRtpNotice implements Listener {
     private final EnthusiaTeleportPlugin plugin;
-    private final Map<UUID, Display> displays = new HashMap<>();
+    private final Map<UUID, Display> displays = new java.util.HashMap<>();
 
     public NewcomerRtpNotice(EnthusiaTeleportPlugin plugin) {
         this.plugin = plugin;
@@ -40,13 +40,7 @@ public final class NewcomerRtpNotice implements Listener {
     void refresh(Player player, long now) {
         PluginConfig.RtpSettings settings = plugin.getPluginConfigManager().current().rtp();
         PluginConfig.NewcomerRtpSettings newcomer = settings.newcomer();
-        long first = player.getFirstPlayed();
-        boolean eligible = player.isOnline() && player.hasPermission("enthusia.teleport.rtp")
-                && settings.enabled() && newcomer != null && newcomer.enabled()
-                && newcomer.bossBarEnabled() && newcomer.maxUses() > 0
-                && newcomer.windowSeconds() > 0 && newcomer.windowSeconds() <= Long.MAX_VALUE / 1000L
-                && first > 0 && now >= first && now - first < newcomer.windowSeconds() * 1000L;
-        if (!eligible) {
+        if (!eligible(player, settings, now)) {
             remove(player.getUniqueId());
             return;
         }
@@ -56,10 +50,6 @@ public final class NewcomerRtpNotice implements Listener {
             remove(player.getUniqueId());
             return;
         }
-        long millis = newcomer.windowSeconds() * 1000L - (now - first);
-        long seconds = millis / 1000L + (millis % 1000L == 0 ? 0 : 1);
-        String time = seconds >= 3600 ? (seconds / 3600) + "h " + ((seconds % 3600) / 60) + "m"
-                : seconds >= 60 ? (seconds / 60) + "m " + (seconds % 60) + "s" : seconds + "s";
         String template = plugin.getMessages().rawOr("rtp.newcomer-boss-bar",
                 "&aWilderness RTPs: &f{remaining} &7| &e/rtp &7| &fNewcomer window: {time}");
         if (template.isBlank()) {
@@ -68,19 +58,52 @@ public final class NewcomerRtpNotice implements Listener {
         }
         var title = LegacyComponentSerializer.legacyAmpersand().deserialize(template
                 .replace("{remaining}", limit < 0 ? "unlimited" : remaining + " left")
-                .replace("{time}", time));
+                .replace("{time}", remainingTime(newcomer, player.getFirstPlayed(), now)));
+        show(player, title);
+    }
+
+    private boolean eligible(Player player, PluginConfig.RtpSettings settings, long now) {
+        var newcomer = settings.newcomer();
+        return player.isOnline() && player.hasPermission("enthusia.teleport.rtp")
+                && settings.enabled() && newcomer != null && noticeEnabled(newcomer)
+                && validWindow(newcomer, player.getFirstPlayed(), now);
+    }
+
+    private boolean noticeEnabled(PluginConfig.NewcomerRtpSettings newcomer) {
+        return newcomer.enabled() && newcomer.bossBarEnabled() && newcomer.maxUses() > 0
+                && newcomer.windowSeconds() > 0 && newcomer.windowSeconds() <= Long.MAX_VALUE / 1000L;
+    }
+
+    private boolean validWindow(PluginConfig.NewcomerRtpSettings newcomer, long first, long now) {
+        return first > 0 && now >= first && now - first < newcomer.windowSeconds() * 1000L;
+    }
+
+    private String remainingTime(PluginConfig.NewcomerRtpSettings newcomer, long first, long now) {
+        long millis = newcomer.windowSeconds() * 1000L - (now - first);
+        long seconds = millis / 1000L + (millis % 1000L == 0 ? 0 : 1);
+        if (seconds >= 3600) return (seconds / 3600) + "h " + ((seconds % 3600) / 60) + "m";
+        if (seconds >= 60) return (seconds / 60) + "m " + (seconds % 60) + "s";
+        return seconds + "s";
+    }
+
+    private void show(Player player, net.kyori.adventure.text.Component title) {
         Display display = displays.get(player.getUniqueId());
         if (display != null && display.player() != player) {
             remove(player.getUniqueId());
-            display = null;
+            create(player, title);
+            return;
         }
         if (display == null) {
-            BossBar bar = BossBar.bossBar(title, 1.0f, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS);
-            displays.put(player.getUniqueId(), new Display(player, bar));
-            player.showBossBar(bar);
+            create(player, title);
         } else {
             display.bar().name(title);
         }
+    }
+
+    private void create(Player player, net.kyori.adventure.text.Component title) {
+        BossBar bar = BossBar.bossBar(title, 1.0f, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS);
+        displays.put(player.getUniqueId(), new Display(player, bar));
+        player.showBossBar(bar);
     }
 
     private void remove(UUID id) {

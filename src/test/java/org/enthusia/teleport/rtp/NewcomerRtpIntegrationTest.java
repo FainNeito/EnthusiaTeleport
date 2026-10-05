@@ -86,14 +86,8 @@ final class NewcomerRtpIntegrationTest {
         var messages = mock(Messages.class);
         when(plugin.getMessages()).thenReturn(messages);
         when(player.isOnline()).thenReturn(true);
-        Class<?> searchType = Class.forName("org.enthusia.teleport.rtp.RtpManager$RtpSearch");
-        var constructor = searchType.getDeclaredConstructor(UUID.class, long.class);
-        constructor.setAccessible(true);
-        Object search = constructor.newInstance(id, System.currentTimeMillis());
-        var validate = RtpManager.class.getDeclaredMethod("validateCandidate", searchType, Player.class,
-                org.bukkit.World.class, int.class, int.class, PluginConfig.RtpSettings.class);
-        validate.setAccessible(true);
-        validate.invoke(rtp, search, player, null, 0, 0, settings);
+        var search = new RtpManager.RtpSearch(id, System.currentTimeMillis());
+        rtp.validateCandidate(search, player, null, 0, 0, settings);
         verify(messages).send(player, "rtp.limit-reached", Map.of("limit", "3"));
         verify(plugin, never()).getTeleportManager();
         assertEquals(3, rtp.getUses(id));

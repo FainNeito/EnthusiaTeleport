@@ -25,8 +25,7 @@ public final class SurvivalOnboarding {
     }
 
     public void firstSuccessfulRtp(Player player, long now) {
-        long first = player.getFirstPlayed();
-        if (!enabled() || !player.isOnline() || first <= 0 || now < first || now - first >= 86_400_000L
+        if (!enabled() || !player.isOnline() || !withinFirstDay(player.getFirstPlayed(), now)
                 || !player.hasPermission("enthusia.teleport.sethome")
                 || plugin.getHomeManager().getHomeCount(player.getUniqueId()) != 0
                 || plugin.getHomeManager().getHomeLimit(player) <= 0) {
@@ -35,6 +34,10 @@ public final class SurvivalOnboarding {
         send(player, "onboarding.first-home",
                 "&aFound a place you like? &fUse &e/sethome base &fto save it, then &e/home base &fto return. &7You can explore first.",
                 ClickEvent.suggestCommand("/sethome base"));
+    }
+
+    private boolean withinFirstDay(long first, long now) {
+        return first > 0 && now >= first && now - first < 86_400_000L;
     }
 
     private boolean enabled() {

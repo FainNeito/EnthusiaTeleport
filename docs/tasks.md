@@ -18,4 +18,6 @@
 - [x] RET-006 ENGINE/ARCH: optional platform prompts, real `/rtp` action preserves command checks, `/sethome base` only suggested, first-success marker reuses persistent RTP counter; no extra writes/home creation.
 - [x] RET-006 REFINE: clean verify 40 tests pass, zero failures/errors/skips. Four new checks cover persistent suppression after reconstruction, existing homes/permissions/zero limit, timestamp/disabled gates and command click semantics. Hosted review and runtime remain pending.
 
+- [x] REVIEW-refine: Codacy exposed ten exact-head findings on 4f65e5a. Split boss-bar eligibility/time/display responsibilities, remove null reassignment, extract first-day gate, remove test reflection with package-internal typed search access and normalize constants. Documented narrow PMD suppressions retain main-thread HashMap and compatibility constructor rather than changing thread/API semantics. Added same-UUID reconnect ownership regression. Latest clean verify passes 41 tests; hosted reanalysis/approval remains pending.
+
 No project-local EARS validator or SPEAR state helper exists in this repository. The existing SPEAR Paper brownfield workflow was located and read; this requirement/task/evidence record is maintained without claiming unavailable tooling passed.

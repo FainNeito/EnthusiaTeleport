@@ -283,7 +283,7 @@ public class RtpManager {
         return CandidateRequestStatus.CONTINUE;
     }
 
-    private void validateCandidate(RtpSearch search, Player player, World world, int x, int z, PluginConfig.RtpSettings settings) {
+    void validateCandidate(RtpSearch search, Player player, World world, int x, int z, PluginConfig.RtpSettings settings) {
         if (!player.isOnline()) {
             search.requestRemoval("rtp.fail.offline");
             return;
@@ -441,7 +441,7 @@ public class RtpManager {
         dirty = false;
     }
 
-    private static final class RtpSearch {
+    static final class RtpSearch {
         private final UUID playerUuid;
         private final long startedAtMillis;
         private int attemptCount;
@@ -449,7 +449,7 @@ public class RtpManager {
         private boolean removalRequested;
         private String removalCounterName = "rtp.queue_removals";
 
-        private RtpSearch(UUID playerId, long startedAt) {
+        RtpSearch(UUID playerId, long startedAt) {
             this.playerUuid = playerId;
             this.startedAtMillis = startedAt;
         }
