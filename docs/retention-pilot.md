@@ -16,6 +16,8 @@ Runtime gate: verify fresh first-play timestamp availability, Java/Bedrock width
 
 ## Pilot configuration proposal
 
+Protected destinations: `rtp.excluded-regions: [warzone, spawn, market]` checks the live WorldGuard region objects after safe-location adjustment and at warmup completion. No rank/member/admin teleport bypass exemption. Source locations remain allowed, including spawn, so RTP can start survival. Missing provider/manager/named region blocks RTP; explicit empty list opts out. This restriction is independent of the newcomer pilot. Verify authorized isolated runtime inside/on/outside each boundary, safe-search shifts, region resize during warmup, provider unavailability, no use consumed on rejection, and spawn-to-wilderness success before production activation.
+
 Apply only after review, merge, canonical build, deployment authorization and runtime acceptance. Preserve all other production settings:
 
 ```yaml

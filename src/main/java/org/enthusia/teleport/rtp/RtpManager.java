@@ -30,6 +30,7 @@ public class RtpManager {
 
     private final EnthusiaTeleportPlugin plugin;
     private final File file;
+    private final RtpRegionGuard regionGuard;
     private final Map<UUID, Integer> uses = new ConcurrentHashMap<>();
     private final Queue<RtpSearch> queuedSearches = new ArrayDeque<>();
     private final List<RtpSearch> activeSearches = new ArrayList<>();
@@ -42,6 +43,7 @@ public class RtpManager {
 
     public RtpManager(EnthusiaTeleportPlugin plugin) {
         this.plugin = plugin;
+        this.regionGuard = new RtpRegionGuard(plugin);
         this.file = new File(plugin.getDataFolder(), "rtp_uses.yml");
         load();
     }
@@ -303,19 +305,20 @@ public class RtpManager {
                 : safeFinder.findSafeTeleportLocation(candidate);
 
         plugin.getPerformanceMonitor().increment("rtp.attempts");
-        if (destination == null || !passesFinalSpacing(destination, settings)) {
+        if (destination == null || !regionGuard.allows(destination) || !passesFinalSpacing(destination, settings)) {
             plugin.getPerformanceMonitor().increment("rtp.fail.unsafe");
             return;
         }
 
         rememberRecent(destination);
-        plugin.getTeleportManager().startTeleport(
+        plugin.getTeleportManager().startTeleportGuarded(
                 player,
                 destination,
                 false,
                 null,
                 "teleport.warmup-start",
-                () -> incrementUse(player.getUniqueId())
+                () -> incrementUse(player.getUniqueId()),
+                regionGuard::allows
         );
         search.requestRemoval("rtp.completed");
     }

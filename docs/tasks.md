@@ -10,4 +10,8 @@
 - [ ] REVIEW: upstream PR #16 published; exact-head checks/review inspected in the delivery turn. Hosted CI and review approval remain pending. No merge authorization.
 - [ ] RUNTIME: merged-source/monorepo release checks, explicitly authorized deployment, fresh Java/Bedrock acceptance, baseline and pilot observation. Not established by local tests.
 
+- [x] RET-005 SPEC/PROVE: current main re-fetched unchanged; clean ongoing branch preserved. Source lacked region exclusion; production read-only region file confirms world regions warzone/spawn/market. No fabricated historical red test. Optional clarification distinguishes destinations from origins; destination exclusion is stated assumption.
+- [x] RET-005 ENGINE/ARCH: main-thread WorldGuard adapter checks configured live region geometry after safe search and again at warmup execution. No region membership/bypass exception; missing data fails closed. Additive guarded TeleportManager entry preserves existing callers and success accounting.
+- [x] RET-005 REFINE: 36 tests pass on clean verify; four region/provider tests plus delayed execution rejection regression, updated descriptor contract. API signatures checked against production-version published WG 7.0.19/WE 7.4.4 artifacts; compile API 7.0.17 keeps Java 21 compatibility. Exact-head hosted checks remain separate.
+
 No project-local EARS validator or SPEAR state helper exists in this repository. The existing SPEAR Paper brownfield workflow was located and read; this requirement/task/evidence record is maintained without claiming unavailable tooling passed.

@@ -1,5 +1,10 @@
 # Newcomer RTP pilot requirements
 
+## RET-005 - Protected-area destination exclusion
+WHEN RTP searches for or completes a destination THE SYSTEM SHALL reject any point in the configured WorldGuard regions warzone, spawn or market, regardless of rank, region membership, priority or teleport bypass permissions.
+
+Acceptance: inspect live WorldGuard region geometry, including overlapping regions and safe-search adjustments; recheck at warmup completion; failed/blocked attempts consume no use. Missing provider, missing configured region or unavailable region manager fails closed for RTP. Destination exclusion is the stated assumption after optional clarification; spawn remains an allowed origin so newcomers can start survival. Other teleports retain their semantics. No production changes.
+
 ## RET-004 - On-screen discovery
 WHILE an online player has RTP permission, an enabled newcomer allowance, a valid unexpired first-play window and remaining RTP uses THE SYSTEM SHALL display a separate boss bar with the effective remaining uses, `/rtp` and time until the newcomer window ends, unless the boss-bar option is disabled.
 

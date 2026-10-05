@@ -79,6 +79,9 @@ spawn:
     override-to-configured-spawn: true
 
 rtp:
+  # RTP destinations must remain outside these live WorldGuard regions.
+  # Missing provider/region data blocks RTP safely. Other teleport commands are unchanged.
+  excluded-regions: [warzone, spawn, market]
   enabled: true
   world: world
 

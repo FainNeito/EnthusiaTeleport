@@ -27,7 +27,14 @@ final class PluginSurfaceContractTest {
 
         assertEquals(new TreeSet<>(EXPECTED_COMMANDS), new TreeSet<>(commands.keySet()));
         assertTrue(raw.contains("depend: [CombatLogX]"), "CombatLogX is a hard runtime dependency and must remain explicit");
-        assertTrue(raw.contains("softdepend: [NewPlayerProtection]"), "NewPlayerProtection soft integration must remain explicit");
+        var descriptor = new org.bukkit.configuration.file.YamlConfiguration();
+        try {
+            descriptor.loadFromString(raw);
+        } catch (org.bukkit.configuration.InvalidConfigurationException failure) {
+            throw new IOException(failure);
+        }
+        assertTrue(descriptor.getStringList("softdepend").containsAll(java.util.List.of("NewPlayerProtection", "WorldGuard")),
+                "Protection and region provider soft integrations must remain explicit");
         assertTrue(raw.contains("api-version: \"1.21\""));
 
         commands.forEach((name, fields) -> {
