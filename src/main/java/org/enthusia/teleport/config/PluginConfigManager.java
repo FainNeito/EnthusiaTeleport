@@ -103,6 +103,12 @@ public class PluginConfigManager {
                         new PluginConfig.SafetySettings(
                                 Math.max(1, config.getInt("rtp.safety.max-attempts-per-player", config.getInt("rtp.max-attempts", 30))),
                                 Math.max(1, config.getInt("rtp.safety.safe-search-radius", config.getInt("teleport.safe-search-radius", 4)))
+                        ),
+                        new PluginConfig.NewcomerRtpSettings(
+                                config.getBoolean("rtp.newcomer.enabled", false),
+                                Math.max(0, config.getInt("rtp.newcomer.max-uses", 3)),
+                                Math.max(0L, Math.min(Long.MAX_VALUE / 1000L,
+                                        config.getLong("rtp.newcomer.window-seconds", 86400L)))
                         )
                 ),
                 new PluginConfig.PersistenceSettings(

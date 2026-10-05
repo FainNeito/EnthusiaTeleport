@@ -91,6 +91,15 @@ rtp:
   # Default number of /rtp uses. 0 means none unless a rank permission grants more.
   max-uses-default: 0
 
+  # Optional beginner pilot. Uses the SAME persistent total as ordinary RTP.
+  # Three total successful uses, not three extra; higher rank limits still apply.
+  # Window begins at this backend's first-play timestamp and includes offline time.
+  # Missing/future timestamps do not grant the allowance. Does not grant RTP permission.
+  newcomer:
+    enabled: false
+    max-uses: 3
+    window-seconds: 86400
+
   rank-limits:
     enthusia.rtp.10: 10
     enthusia.rtp.20: 20

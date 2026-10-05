@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.enthusia.teleport.EnthusiaTeleportPlugin;
 import org.enthusia.teleport.config.PluginConfig;
+import org.enthusia.teleport.domain.rtp.NewcomerRtpPolicy;
 import org.enthusia.teleport.teleport.SafeLocationFinder;
 
 import java.io.File;
@@ -127,7 +128,12 @@ public class RtpManager {
                 max = entry.getValue();
             }
         }
-        return max;
+        PluginConfig.NewcomerRtpSettings newcomer = settings.newcomer();
+        if (newcomer == null || !newcomer.enabled()) {
+            return max;
+        }
+        return NewcomerRtpPolicy.limit(max, newcomer.enabled(), newcomer.maxUses(),
+                newcomer.windowSeconds() * 1000L, player.getFirstPlayed(), System.currentTimeMillis());
     }
 
     public boolean canUse(Player player) {
@@ -278,6 +284,14 @@ public class RtpManager {
     private void validateCandidate(RtpSearch search, Player player, World world, int x, int z, PluginConfig.RtpSettings settings) {
         if (!player.isOnline()) {
             search.requestRemoval("rtp.fail.offline");
+            return;
+        }
+        // Searches may have been queued while a use was still available. Recheck
+        // after the async chunk lookup before starting another teleport.
+        if (!canUse(player)) {
+            plugin.getMessages().send(player, "rtp.limit-reached",
+                    Map.of("limit", String.valueOf(getLimit(player))));
+            search.requestRemoval("rtp.fail.limit");
             return;
         }
         int y = world.getHighestBlockYAt(x, z) + 1;
