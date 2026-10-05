@@ -14,4 +14,8 @@
 - [x] RET-005 ENGINE/ARCH: main-thread WorldGuard adapter checks configured live region geometry after safe search and again at warmup execution. No region membership/bypass exception; missing data fails closed. Additive guarded TeleportManager entry preserves existing callers and success accounting.
 - [x] RET-005 REFINE: 36 tests pass on clean verify; four region/provider tests plus delayed execution rejection regression, updated descriptor contract. API signatures checked against production-version published WG 7.0.19/WE 7.4.4 artifacts; compile API 7.0.17 keeps Java 21 compatibility. Exact-head hosted checks remain separate.
 
+- [x] RET-006 SPEC/PROVE: existing source has no Start Survival join action or first-success home prompt. Existing SetHomeCommand requires a name, so actual guidance uses `/sethome base`. Source absence evidence, not fabricated red tests.
+- [x] RET-006 ENGINE/ARCH: optional platform prompts, real `/rtp` action preserves command checks, `/sethome base` only suggested, first-success marker reuses persistent RTP counter; no extra writes/home creation.
+- [x] RET-006 REFINE: clean verify 40 tests pass, zero failures/errors/skips. Four new checks cover persistent suppression after reconstruction, existing homes/permissions/zero limit, timestamp/disabled gates and command click semantics. Hosted review and runtime remain pending.
+
 No project-local EARS validator or SPEAR state helper exists in this repository. The existing SPEAR Paper brownfield workflow was located and read; this requirement/task/evidence record is maintained without claiming unavailable tooling passed.

@@ -317,10 +317,18 @@ public class RtpManager {
                 false,
                 null,
                 "teleport.warmup-start",
-                () -> incrementUse(player.getUniqueId()),
+                () -> recordSuccessfulRtp(player),
                 regionGuard::allows
         );
         search.requestRemoval("rtp.completed");
+    }
+
+    void recordSuccessfulRtp(Player player) {
+        boolean firstSuccess = getUses(player.getUniqueId()) == 0;
+        incrementUse(player.getUniqueId());
+        if (firstSuccess) {
+            new SurvivalOnboarding(plugin).firstSuccessfulRtp(player, System.currentTimeMillis());
+        }
     }
 
     private boolean passesCheapSpacing(World world, int x, int z, PluginConfig.RtpSettings settings) {

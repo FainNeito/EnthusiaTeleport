@@ -14,7 +14,8 @@
 - New coverage: disabled/invalid/unknown eligibility; exact expiry; higher finite and negative computed limits; config defaults and safe duration bounds; existing UUID counts retained through flush/reconstruction and disabling/re-enabling; legacy constructor; exhausted queued search rejected before destination/teleport access.
 - `git diff --check`: passed.
 - Latest protected-region follow-up: Maven clean verify passes 36 tests, zero failures/errors/skips (region-final-verify.log). Covers production cuboid inclusive edges/flooring, independent shapes/live resizing, missing region/manager/provider, and denial after a simulated region change during warmup with no teleport or successful-use callback.
-- Latest unmerged/local test artifact only: target/EnthusiaTeleport-1.2.10-SNAPSHOT.jar. SHA-256 44FDB85081A9E721ACE23C2DB3F78EBA15EAF7700DE096F1680FCD731CE7A097. This is not a production artifact.
+- Onboarding follow-up clean verify: 40 tests, zero failures/errors/skips (onboarding-final-verify.log). Four new checks cover persistent first-success suppression after reconstruction, home/permission/limit gating, valid-window enforcement and run-versus-suggest command click semantics. A failed warmup still never executes the successful-use callback. Platform messages are dispatched only by the existing successful callback or known first backend join.
+- Latest unmerged/local test artifact only: target/EnthusiaTeleport-1.2.10-SNAPSHOT.jar. SHA-256 5363BF91AACC9BE90294EC97A9385D550B6DC706CF08876120CF7DB58724380F. This is not a production artifact.
 
 Region integration: production read-only file inventory shows worldguard-bukkit-7.0.19.jar and FastAsyncWorldEdit-Paper-2.15.4.jar. Live world regions warzone (-219,-64,-405)..(219,319,189), spawn (-49,78,-34)..(69,319,84), market (-73,-64,-282)..(102,319,-163). Coordinates are evidence/test fixtures only; implementation queries live region objects.
 

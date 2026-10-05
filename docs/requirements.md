@@ -1,5 +1,12 @@
 # Newcomer RTP pilot requirements
 
+## RET-006 - Survival entry and first-home guidance
+WHEN an opted-in onboarding installation receives a first backend join with enabled RTP and permission THE SYSTEM SHALL show a readable Start Survival action executing the existing `/rtp` command.
+
+WHEN a valid newcomer completes their first successful RTP and has no home, a positive home limit and sethome permission THE SYSTEM SHALL suggest `/sethome base` and explain `/home base` without executing either command.
+
+Acceptance: disabled by default; existing RTP counter identifies first success across relogs/reloads; failures never trigger the prompt; future/unknown/expired first-play timestamps suppress the home prompt. Readable commands work without click support; Java supports a click-to-suggest home command. No auto-created home, no new persistence or bypass of command permissions/combat/region checks.
+
 ## RET-005 - Protected-area destination exclusion
 WHEN RTP searches for or completes a destination THE SYSTEM SHALL reject any point in the configured WorldGuard regions warzone, spawn or market, regardless of rank, region membership, priority or teleport bypass permissions.
 

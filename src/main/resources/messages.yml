@@ -4,6 +4,9 @@
 
 config-version: 3
 
+onboarding.start-survival: "&a&l[Start Survival] &fUse /rtp to find wilderness and build a home."
+onboarding.first-home: "&aFound a place you like? &fUse &e/sethome base &fto save it, then &e/home base &fto return. &7You can explore first."
+
 generic.no-console: "&cOnly players can use this command."
 generic.no-permission: "&cYou do not have permission to do that."
 

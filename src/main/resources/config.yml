@@ -37,6 +37,10 @@ homes:
     enthusia.homes.10: 10
     enthusia.homes.20: 20
 
+onboarding:
+  # Opt-in first-join Start Survival and first-successful-RTP home guidance.
+  enabled: false
+
 spawn:
   # If false, /spawn and spawn-based fallbacks use the world's normal spawn instead of the coordinates below.
   use-configured-spawn: true
