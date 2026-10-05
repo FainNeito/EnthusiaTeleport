@@ -81,7 +81,10 @@ public record PluginConfig(
         }
     }
 
-    public record NewcomerRtpSettings(boolean enabled, int maxUses, long windowSeconds) {
+    public record NewcomerRtpSettings(boolean enabled, int maxUses, long windowSeconds, boolean bossBarEnabled) {
+        public NewcomerRtpSettings(boolean enabled, int maxUses, long windowSeconds) {
+            this(enabled, maxUses, windowSeconds, true);
+        }
     }
 
     public record QueueSettings(

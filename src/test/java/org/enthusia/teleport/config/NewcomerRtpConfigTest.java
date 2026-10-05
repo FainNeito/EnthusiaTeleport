@@ -21,16 +21,19 @@ final class NewcomerRtpConfigTest {
         assertFalse(rtp.newcomer().enabled());
         assertEquals(3, rtp.newcomer().maxUses());
         assertEquals(86400, rtp.newcomer().windowSeconds());
+        assertTrue(rtp.newcomer().bossBarEnabled());
     }
 
     @Test
     void explicitPilotAndInvalidWindowAreParsedSafely() {
         var yaml = new YamlConfiguration();
         yaml.set("rtp.newcomer.enabled", true);
+        yaml.set("rtp.newcomer.boss-bar-enabled", false);
         yaml.set("rtp.newcomer.max-uses", 3);
         yaml.set("rtp.newcomer.window-seconds", Long.MAX_VALUE);
         var rtp = parse(yaml);
         assertTrue(rtp.newcomer().enabled());
+        assertFalse(rtp.newcomer().bossBarEnabled());
         assertEquals(Long.MAX_VALUE / 1000L, rtp.newcomer().windowSeconds());
         yaml.set("rtp.newcomer.window-seconds", -1);
         yaml.set("rtp.newcomer.max-uses", -1);

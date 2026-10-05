@@ -108,7 +108,8 @@ public class PluginConfigManager {
                                 config.getBoolean("rtp.newcomer.enabled", false),
                                 Math.max(0, config.getInt("rtp.newcomer.max-uses", 3)),
                                 Math.max(0L, Math.min(Long.MAX_VALUE / 1000L,
-                                        config.getLong("rtp.newcomer.window-seconds", 86400L)))
+                                        config.getLong("rtp.newcomer.window-seconds", 86400L))),
+                                config.getBoolean("rtp.newcomer.boss-bar-enabled", true)
                         )
                 ),
                 new PluginConfig.PersistenceSettings(

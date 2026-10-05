@@ -1,5 +1,10 @@
 # Newcomer RTP pilot requirements
 
+## RET-004 - On-screen discovery
+WHILE an online player has RTP permission, an enabled newcomer allowance, a valid unexpired first-play window and remaining RTP uses THE SYSTEM SHALL display a separate boss bar with the effective remaining uses, `/rtp` and time until the newcomer window ends, unless the boss-bar option is disabled.
+
+Acceptance: higher rank limits are reflected; unlimited limits say unlimited. Refresh once per second; remove on exhaustion, expiry, permission loss, disconnect, config reload and plugin disable. Do not write to the action bar used by aNewbie. No aNewbie API dependency. Java/Bedrock layout remains a client acceptance gate.
+
 ## RET-001 - Optional newcomer allowance
 WHEN the newcomer RTP pilot is enabled and a player's valid first-play timestamp is within the configured elapsed-time window THE SYSTEM SHALL raise their finite RTP limit to at least the configured newcomer total.
 

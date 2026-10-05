@@ -8,7 +8,11 @@ The network retention help states that it compares first registration to last se
 
 Production Teleport configuration inspected earlier in this conversation gives first joins stone tools and eight beef, one default RTP use within +/-5,000, and zero minimum RTP spacing. aNewbie config provides 30 minutes of player-damage protection. These are configuration observations; effective permissions and Java/Bedrock client behavior still require acceptance checks.
 
-Hypothesis: an unsatisfactory first wilderness destination with no retry may discourage newcomers. Three total successful RTP uses during the first 24 elapsed hours may improve entry into survival. The additional allowance is optional and disabled by default. This patch does not alter spawn UI, resource packs, protection, geography or rank permissions.
+Hypothesis: an unsatisfactory first wilderness destination with no retry may discourage newcomers. Three total successful RTP uses during the first 24 elapsed hours may improve entry into survival. The additional allowance is optional and disabled by default. A separate top-of-screen boss bar now explains `/rtp`, effective remaining uses and the newcomer window. It leaves aNewbie's action bar and protection state untouched.
+
+Read-only production aNewbie config on October 5 confirmed both action bar and green boss bar enabled. The RTP boss bar appears within the next one-second refresh on join/rejoin for eligible players, stays while uses remain during the first-play window, updates within one second of use and disappears on expiry/exhaustion/permission loss/disconnect. It clears on reload/disable. Higher ranks use their actual computed limits; the time label explicitly refers to the newcomer window rather than rank expiry. `rtp.newcomer.boss-bar-enabled: false` opts out; `rtp.newcomer-boss-bar` in messages.yml customizes the text. No chat onboarding or menu changes are included.
+
+Runtime gate: verify fresh first-play timestamp availability, Java/Bedrock width and simultaneous aNewbie/other boss bars, command discoverability, successful/failed use count display, exhaustion, reconnect and reload/disable cleanup. A local test cannot establish client appearance or newcomer understanding.
 
 ## Pilot configuration proposal
 

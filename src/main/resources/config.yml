@@ -99,6 +99,8 @@ rtp:
     enabled: false
     max-uses: 3
     window-seconds: 86400
+    # Separate top-of-screen bar; leaves aNewbie's action bar untouched.
+    boss-bar-enabled: true
 
   rank-limits:
     enthusia.rtp.10: 10
