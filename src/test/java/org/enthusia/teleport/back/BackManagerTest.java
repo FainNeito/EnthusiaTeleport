@@ -91,15 +91,17 @@ class BackManagerTest {
     @Test
     void disabledHistoryAndInvalidRecordsAreIgnored() {
         BackManager disabled = new BackManager(pluginWithBackMax(0));
+        BackManager enabled = new BackManager(pluginWithBackMax(2));
         Player player = player();
         World world = mock(World.class);
 
         disabled.record(player, location(world, 1.0, 64.0, 1.0));
-        disabled.record(null, location(world, 2.0, 64.0, 2.0));
-        disabled.record(player, null);
-        disabled.record(player, location(null, 3.0, 64.0, 3.0));
+        enabled.record(null, location(world, 2.0, 64.0, 2.0));
+        enabled.record(player, null);
+        enabled.record(player, location(null, 3.0, 64.0, 3.0));
 
         assertNull(disabled.peek(player));
+        assertNull(enabled.peek(player));
         assertNull(disabled.peek(null));
     }
 
