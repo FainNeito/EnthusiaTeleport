@@ -19,9 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.enthusia.teleport.EnthusiaTeleportPlugin;
@@ -38,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -62,7 +59,6 @@ public final class BedHomeManager implements Listener {
     private static final Pattern VALID_NAME = Pattern.compile("[A-Za-z0-9_-]{1,32}");
     private static final int BED_SEARCH_HORIZONTAL_RADIUS = 3;
     private static final int BED_SEARCH_VERTICAL_RADIUS = 2;
-    private static final double RECENT_BED_MAX_DISTANCE_SQUARED = 64.0D;
 
     private final EnthusiaTeleportPlugin plugin;
     private final File file;
@@ -71,7 +67,6 @@ public final class BedHomeManager implements Listener {
     private final Object ioLock = new Object();
     private final Map<UUID, Map<String, BedHome>> beds = new ConcurrentHashMap<>();
     private final Map<UUID, List<BedBreakNotice>> pendingBreakNotices = new ConcurrentHashMap<>();
-    private final Map<UUID, BedBlockKey> recentBedInteractions = new HashMap<>();
 
     private long mutationVersion;
     private long persistedVersion;
@@ -91,7 +86,6 @@ public final class BedHomeManager implements Listener {
 
     public void reload() {
         cancelVanillaImport();
-        recentBedInteractions.clear();
         load();
         scheduleVanillaImportIfNeeded();
     }
@@ -253,28 +247,17 @@ public final class BedHomeManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBedEnter(PlayerBedEnterEvent event) {
-        BedBlockKey key = canonicalBed(event.getBed());
-        if (key == null) {
-            return;
-        }
-
-        UUID playerId = event.getPlayer().getUniqueId();
-        recentBedInteractions.put(playerId, key);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> recentBedInteractions.remove(playerId, key), 10L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSpawnSet(PlayerSetSpawnEvent event) {
         if (event.getCause() != PlayerSetSpawnEvent.Cause.BED || event.getLocation() == null) {
             return;
         }
 
-        UUID playerId = event.getPlayer().getUniqueId();
-        BedBlockKey recent = recentBedInteractions.remove(playerId);
-        BedBlockKey bedKey = recent != null && isNear(recent, event.getLocation())
-                ? recent
-                : findUniqueBedNear(event.getLocation());
+        // Paper fires PlayerSetSpawnEvent before PlayerBedEnterEvent. Resolve the exact bed from
+        // the spawn location first; only use the nearby search as a compatibility fallback.
+        BedBlockKey bedKey = canonicalBed(event.getLocation().getBlock());
+        if (bedKey == null) {
+            bedKey = findUniqueBedNear(event.getLocation());
+        }
 
         if (bedKey == null) {
             plugin.getLogger().warning("Could not unambiguously identify the bed while saving a bed home for "
@@ -309,11 +292,6 @@ public final class BedHomeManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTask(plugin, () -> deliverPendingBreakNotices(player));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent event) {
-        recentBedInteractions.remove(event.getPlayer().getUniqueId());
     }
 
     private void upsertBed(Player player, BedBlockKey bedKey, Location teleportLocation, boolean announceNew) {
@@ -665,17 +643,6 @@ public final class BedHomeManager implements Listener {
         return value + " " + unit + (value == 1L ? "" : "s");
     }
 
-    private boolean isNear(BedBlockKey bed, Location location) {
-        World world = location.getWorld();
-        if (world == null || !bed.worldName().equals(world.getName())) {
-            return false;
-        }
-        double dx = bed.x() + 0.5D - location.getX();
-        double dy = bed.y() + 0.5D - location.getY();
-        double dz = bed.z() + 0.5D - location.getZ();
-        return dx * dx + dy * dy + dz * dz <= RECENT_BED_MAX_DISTANCE_SQUARED;
-    }
-
     private BedBlockKey findUniqueBedNear(Location location) {
         World world = location.getWorld();
         if (world == null) {
@@ -726,7 +693,6 @@ public final class BedHomeManager implements Listener {
     private void load() {
         beds.clear();
         pendingBreakNotices.clear();
-        recentBedInteractions.clear();
         saveInProgress = false;
         mutationVersion = 0L;
         persistedVersion = 0L;
