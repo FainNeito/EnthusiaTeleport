@@ -15,9 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -31,10 +29,8 @@ import org.enthusia.teleport.util.Messages;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -51,7 +47,6 @@ public class BedCommand implements CommandExecutor, Listener {
     private static final int CANCEL_DELETE_SLOT = 15;
 
     private final EnthusiaTeleportPlugin plugin;
-    private final Map<UUID, BedBlockKey> recentBedInteractions = new HashMap<>();
 
     public BedCommand(EnthusiaTeleportPlugin plugin) {
         this.plugin = plugin;
@@ -94,22 +89,6 @@ public class BedCommand implements CommandExecutor, Listener {
     }
 
     /**
-     * Capture the exact bed block the player interacted with so PlayerSetSpawnEvent can distinguish
-     * sleeping in the already-saved bed from attempting to save a different bed.
-     */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBedEnter(PlayerBedEnterEvent event) {
-        BedBlockKey key = canonicalBed(event.getBed());
-        if (key == null) {
-            return;
-        }
-
-        UUID playerId = event.getPlayer().getUniqueId();
-        recentBedInteractions.put(playerId, key);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> recentBedInteractions.remove(playerId, key), 10L);
-    }
-
-    /**
      * Minecraft normally changes the player's bed spawn whenever a bed is used. EnthusiaTeleport
      * intentionally keeps one persistent /bed instead: the first bed is saved, the same bed may be
      * refreshed, and a different bed is ignored until the existing saved bed is explicitly deleted.
@@ -126,7 +105,9 @@ public class BedCommand implements CommandExecutor, Listener {
             return;
         }
 
-        BedBlockKey interacted = recentBedInteractions.remove(player.getUniqueId());
+        // Paper sets the respawn point before PlayerBedEnterEvent is fired, so the spawn event
+        // itself must be the source of truth for which physical bed is being used.
+        BedBlockKey interacted = canonicalBed(event.getLocation().getBlock());
         if (!BedAccessPolicy.isOverLimit(homes)
                 && interacted != null
                 && BedAccessPolicy.matchesOnlySavedBed(
@@ -156,11 +137,6 @@ public class BedCommand implements CommandExecutor, Listener {
                 sendOverLimit(player);
             }
         }, 20L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent event) {
-        recentBedInteractions.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
