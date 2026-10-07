@@ -1,11 +1,11 @@
 name: EnthusiaTeleport
 main: org.enthusia.teleport.EnthusiaTeleportPlugin
-version: 1.2.9
+version: 1.2.10-SNAPSHOT
 api-version: "1.21"
 author: P2wn
 description: Teleport, home, spawn, and staff utility plugin for Enthusia. Messaging is provided by RoseChat.
 depend: [CombatLogX]
-softdepend: [NewPlayerProtection]
+softdepend: [NewPlayerProtection, WorldGuard]
 
 commands:
   tpa:

@@ -37,6 +37,7 @@ import org.enthusia.teleport.player.LastLocationManager;
 import org.enthusia.teleport.player.OfflineNameCache;
 import org.enthusia.teleport.request.TeleportRequestManager;
 import org.enthusia.teleport.rtp.RtpManager;
+import org.enthusia.teleport.rtp.NewcomerRtpNotice;
 import org.enthusia.teleport.spawn.SpawnManager;
 import org.enthusia.teleport.teleport.TeleportManager;
 import org.enthusia.teleport.task.TaskCoordinator;
@@ -58,6 +59,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
     private TeleportManager teleportManager;
     private TeleportRequestManager requestManager;
     private RtpManager rtpManager;
+    private NewcomerRtpNotice newcomerRtpNotice;
     private CombatTagManager combatManager;
     private HomeGuiManager homeGuiManager;
     private InventoryViewCommand inventoryViewCommand;
@@ -92,6 +94,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
         this.requestManager = new TeleportRequestManager(this);
         this.teleportManager.setRequestManager(requestManager);
         this.rtpManager = new RtpManager(this);
+        this.newcomerRtpNotice = new NewcomerRtpNotice(this);
         this.combatManager = new CombatTagManager(this);
         this.homeGuiManager = new HomeGuiManager(this);
         this.inventoryViewCommand = new InventoryViewCommand(this);
@@ -110,6 +113,9 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (newcomerRtpNotice != null) {
+            newcomerRtpNotice.clear();
+        }
         if (taskCoordinator != null) {
             taskCoordinator.cancelAll();
         }
@@ -127,6 +133,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
     }
 
     public void reloadPlugin() {
+        newcomerRtpNotice.clear();
         saveAllDataBlocking();
         adminLogManager.flushBlocking();
         teleportManager.cancelAll(CancelReason.RELOAD);
@@ -263,6 +270,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(spawnManager, this);
         Bukkit.getPluginManager().registerEvents(lastLocationManager, this);
         Bukkit.getPluginManager().registerEvents(offlineNameCache, this);
+        Bukkit.getPluginManager().registerEvents(newcomerRtpNotice, this);
     }
 
     public PluginConfigManager getPluginConfigManager() {
@@ -295,6 +303,10 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
 
     public RtpManager getRtpManager() {
         return rtpManager;
+    }
+
+    public NewcomerRtpNotice getNewcomerRtpNotice() {
+        return newcomerRtpNotice;
     }
 
     public CombatTagManager getCombatManager() {

@@ -4,6 +4,9 @@
 
 config-version: 3
 
+onboarding.start-survival: "&a&l[Start Survival] &fUse /rtp to find wilderness and build a home."
+onboarding.first-home: "&aFound a place you like? &fUse &e/sethome base &fto save it, then &e/home base &fto return. &7You can explore first."
+
 generic.no-console: "&cOnly players can use this command."
 generic.no-permission: "&cYou do not have permission to do that."
 
@@ -124,6 +127,7 @@ invsee.opened-inv: "&aViewing &e{target}&a's inventory. &7[&eClick to view ender
 invsee.opened-ender: "&aViewing &e{target}&a's ender chest. &7[&eClick to view inventory&7]"
 
 rtp.disabled: "&cRandom teleport is currently disabled."
+rtp.newcomer-boss-bar: "&aWilderness RTPs: &f{remaining} &7| &e/rtp &7| &fNewcomer window: {time}"
 rtp.limit-reached: "&cYou have used all your random teleports (&e{limit}&c)."
 rtp.usage: "&cUsage: &e/rtp"
 rtp.search-queued: "&eSearching for a safe random location..."

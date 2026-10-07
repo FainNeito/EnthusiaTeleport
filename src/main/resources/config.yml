@@ -37,6 +37,10 @@ homes:
     enthusia.homes.10: 10
     enthusia.homes.20: 20
 
+onboarding:
+  # Opt-in first-join Start Survival and first-successful-RTP home guidance.
+  enabled: false
+
 spawn:
   # If false, /spawn and spawn-based fallbacks use the world's normal spawn instead of the coordinates below.
   use-configured-spawn: true
@@ -79,6 +83,9 @@ spawn:
     override-to-configured-spawn: true
 
 rtp:
+  # RTP destinations must remain outside these live WorldGuard regions.
+  # Missing provider/region data blocks RTP safely. Other teleport commands are unchanged.
+  excluded-regions: [warzone, spawn, market]
   enabled: true
   world: world
 
@@ -90,6 +97,17 @@ rtp:
 
   # Default number of /rtp uses. 0 means none unless a rank permission grants more.
   max-uses-default: 0
+
+  # Optional beginner pilot. Uses the SAME persistent total as ordinary RTP.
+  # Three total successful uses, not three extra; higher rank limits still apply.
+  # Window begins at this backend's first-play timestamp and includes offline time.
+  # Missing/future timestamps do not grant the allowance. Does not grant RTP permission.
+  newcomer:
+    enabled: false
+    max-uses: 3
+    window-seconds: 86400
+    # Separate top-of-screen bar; leaves aNewbie's action bar untouched.
+    boss-bar-enabled: true
 
   rank-limits:
     enthusia.rtp.10: 10

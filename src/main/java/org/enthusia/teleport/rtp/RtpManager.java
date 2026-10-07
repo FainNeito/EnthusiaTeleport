@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.enthusia.teleport.EnthusiaTeleportPlugin;
 import org.enthusia.teleport.config.PluginConfig;
+import org.enthusia.teleport.domain.rtp.NewcomerRtpPolicy;
 import org.enthusia.teleport.teleport.SafeLocationFinder;
 
 import java.io.File;
@@ -29,6 +30,7 @@ public class RtpManager {
 
     private final EnthusiaTeleportPlugin plugin;
     private final File file;
+    private final RtpRegionGuard regionGuard;
     private final Map<UUID, Integer> uses = new ConcurrentHashMap<>();
     private final Queue<RtpSearch> queuedSearches = new ArrayDeque<>();
     private final List<RtpSearch> activeSearches = new ArrayList<>();
@@ -41,6 +43,7 @@ public class RtpManager {
 
     public RtpManager(EnthusiaTeleportPlugin plugin) {
         this.plugin = plugin;
+        this.regionGuard = new RtpRegionGuard(plugin);
         this.file = new File(plugin.getDataFolder(), "rtp_uses.yml");
         load();
     }
@@ -127,7 +130,12 @@ public class RtpManager {
                 max = entry.getValue();
             }
         }
-        return max;
+        PluginConfig.NewcomerRtpSettings newcomer = settings.newcomer();
+        if (newcomer == null || !newcomer.enabled()) {
+            return max;
+        }
+        return NewcomerRtpPolicy.limit(max, newcomer.enabled(), newcomer.maxUses(),
+                newcomer.windowSeconds() * 1000L, player.getFirstPlayed(), System.currentTimeMillis());
     }
 
     public boolean canUse(Player player) {
@@ -275,9 +283,17 @@ public class RtpManager {
         return CandidateRequestStatus.CONTINUE;
     }
 
-    private void validateCandidate(RtpSearch search, Player player, World world, int x, int z, PluginConfig.RtpSettings settings) {
+    void validateCandidate(RtpSearch search, Player player, World world, int x, int z, PluginConfig.RtpSettings settings) {
         if (!player.isOnline()) {
             search.requestRemoval("rtp.fail.offline");
+            return;
+        }
+        // Searches may have been queued while a use was still available. Recheck
+        // after the async chunk lookup before starting another teleport.
+        if (!canUse(player)) {
+            plugin.getMessages().send(player, "rtp.limit-reached",
+                    Map.of("limit", String.valueOf(getLimit(player))));
+            search.requestRemoval("rtp.fail.limit");
             return;
         }
         int y = world.getHighestBlockYAt(x, z) + 1;
@@ -289,21 +305,30 @@ public class RtpManager {
                 : safeFinder.findSafeTeleportLocation(candidate);
 
         plugin.getPerformanceMonitor().increment("rtp.attempts");
-        if (destination == null || !passesFinalSpacing(destination, settings)) {
+        if (destination == null || !regionGuard.allows(destination) || !passesFinalSpacing(destination, settings)) {
             plugin.getPerformanceMonitor().increment("rtp.fail.unsafe");
             return;
         }
 
         rememberRecent(destination);
-        plugin.getTeleportManager().startTeleport(
+        plugin.getTeleportManager().startTeleportGuarded(
                 player,
                 destination,
                 false,
                 null,
                 "teleport.warmup-start",
-                () -> incrementUse(player.getUniqueId())
+                () -> recordSuccessfulRtp(player),
+                regionGuard::allows
         );
         search.requestRemoval("rtp.completed");
+    }
+
+    void recordSuccessfulRtp(Player player) {
+        boolean firstSuccess = getUses(player.getUniqueId()) == 0;
+        incrementUse(player.getUniqueId());
+        if (firstSuccess) {
+            new SurvivalOnboarding(plugin).firstSuccessfulRtp(player, System.currentTimeMillis());
+        }
     }
 
     private boolean passesCheapSpacing(World world, int x, int z, PluginConfig.RtpSettings settings) {
@@ -416,7 +441,7 @@ public class RtpManager {
         dirty = false;
     }
 
-    private static final class RtpSearch {
+    static final class RtpSearch {
         private final UUID playerUuid;
         private final long startedAtMillis;
         private int attemptCount;
@@ -424,7 +449,7 @@ public class RtpManager {
         private boolean removalRequested;
         private String removalCounterName = "rtp.queue_removals";
 
-        private RtpSearch(UUID playerId, long startedAt) {
+        RtpSearch(UUID playerId, long startedAt) {
             this.playerUuid = playerId;
             this.startedAtMillis = startedAt;
         }
