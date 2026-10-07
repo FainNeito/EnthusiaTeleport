@@ -123,6 +123,24 @@ class RtpManagerStateTest {
     }
 
     @Test
+    void negativeRankLimitGrantsUnlimitedAccessOverFiniteDefault() {
+        RtpManager manager = new RtpManager(plugin(tempDir, settings(2, Map.of(
+                "rank.vip", 5,
+                "rank.unlimited", -1
+        ))).plugin());
+        Player player = player(PLAYER_ID);
+
+        when(player.hasPermission("rank.vip")).thenReturn(true);
+        when(player.hasPermission("rank.unlimited")).thenReturn(true);
+
+        assertEquals(-1, manager.getLimit(player));
+        for (int i = 0; i < 20; i++) {
+            manager.incrementUse(PLAYER_ID);
+        }
+        assertTrue(manager.canUse(player));
+    }
+
+    @Test
     void negativeLimitIsUnlimitedEvenAfterUsageAccumulates() {
         RtpManager manager = new RtpManager(plugin(tempDir, settings(-1, Map.of())).plugin());
         Player player = player(PLAYER_ID);
