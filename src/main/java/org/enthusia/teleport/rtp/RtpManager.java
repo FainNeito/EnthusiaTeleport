@@ -125,9 +125,19 @@ public class RtpManager {
     public int getLimit(Player player) {
         PluginConfig.RtpSettings settings = plugin.getPluginConfigManager().current().rtp();
         int max = settings.maxUsesDefault();
+        if (max < 0) {
+            return max;
+        }
         for (Map.Entry<String, Integer> entry : settings.rankLimits().entrySet()) {
-            if (player.hasPermission(entry.getKey()) && entry.getValue() > max) {
-                max = entry.getValue();
+            if (!player.hasPermission(entry.getKey())) {
+                continue;
+            }
+            int rankLimit = entry.getValue();
+            if (rankLimit < 0) {
+                return rankLimit;
+            }
+            if (rankLimit > max) {
+                max = rankLimit;
             }
         }
         PluginConfig.NewcomerRtpSettings newcomer = settings.newcomer();
