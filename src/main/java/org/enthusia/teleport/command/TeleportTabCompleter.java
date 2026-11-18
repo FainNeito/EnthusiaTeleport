@@ -54,6 +54,7 @@ public class TeleportTabCompleter implements TabCompleter {
             case "home" -> tabHome(sender, args);
             case "homes" -> tabHomes(sender, args);
             case "delhome" -> tabDelHome(sender, args);
+            case "spawn" -> tabSpawn(args);
             case "bed" -> tabBed(sender, args);
             case "tppos" -> tabTppos(args);
             case "tpo" -> tabOfflinePlayers(args);
@@ -66,6 +67,17 @@ public class TeleportTabCompleter implements TabCompleter {
     // ---------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------
+
+    private List<String> tabSpawn(String[] args) {
+        if (args.length == 1 && "respawn".startsWith(args[0].toLowerCase(Locale.ROOT))) {
+            return List.of("respawn");
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("respawn")) {
+            String prefix = args[1].toLowerCase(Locale.ROOT);
+            return List.of("bed", "spawn").stream().filter(mode -> mode.startsWith(prefix)).toList();
+        }
+        return List.of();
+    }
 
     private List<String> tabPlayers(String[] args, int argIndex) {
         if (args.length == NO_ARGUMENTS || args.length - 1 != argIndex) return Collections.emptyList();

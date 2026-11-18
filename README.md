@@ -174,7 +174,7 @@ Bed names are case-insensitive for lookup and must be 1-32 letters, numbers, und
 
 Teleports to the configured Enthusia spawn using the normal 5-second warmup and safe-location check.
 
-The server currently also **forces normal death respawns to the configured server spawn**. In other words, `/bed` can still take a player to a saved bed home, but dying does not currently cause the player to respawn at that bed; the plugin overrides the death respawn location to server spawn.
+With the respawn override enabled, dying returns you to your active Minecraft bed if the server finds a safe spot there. Otherwise you return to server spawn. Use `/spawn respawn spawn` to always respawn at spawn, `/spawn respawn bed` to restore the default, or `/spawn respawn` to check. Using a respawn anchor replaces the active Minecraft bed. Your saved `/bed` home remains available. Plain `/spawn` still teleports you immediately after its usual warmup.
 
 ## First join
 
