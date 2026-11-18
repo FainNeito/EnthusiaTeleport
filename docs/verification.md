@@ -47,3 +47,23 @@ Trusted same-repository validation at head `1ae8a8f378a839b83113995640c1414ce9f2
 Codacy on dd254f4 reported two time-format numeric conditional warnings and duplicate permission/warzone test strings. Named constants preserve identical arithmetic, display text, permission and region values. Existing behavioral tests provide regression coverage; no new behavioral requirement or historical red test is claimed for constant extraction. Maven 3.9.11/JDK 23 clean verify passes 41 tests with zero failures/errors/skips (codacy-four-verify.log). git diff --check passed. That worker-local artifact hash is historical only and is not canonical release provenance.
 
 At that historical fork head, GitHub-hosted jobs required approval and did not execute. This limitation is superseded by the 2026-10-07 same-repository validation above; no success is claimed for those blocked fork runs.
+
+## Bed-first death respawns (1.2.11)
+
+A player with an active, usable Minecraft bed should respawn there by default.
+A player can select server spawn and later restore bed respawns. A missing or
+obstructed bed uses configured spawn. Existing named bed homes, regular homes
+and the completed import marker must survive the change.
+
+The implementation keeps Paper's validated death destination when it is a bed,
+and uses the existing spawn resolver for fallback. The opt-out and one-time
+join tip use namespaced player data. The command never writes the bed/home
+stores or changes the player's vanilla spawn point. The existing global
+respawn override remains the operator control.
+
+Before implementation the valid-bed regression failed because the listener
+replaced the event location. The no-bed fallback control passed. Java 21
+Maven clean verify subsequently passed 69 tests, including preference
+commands, missing beds, the global override and existing persistence tests.
+Live checks were read-only. In-game death, restart and join-message acceptance
+remain pending.
