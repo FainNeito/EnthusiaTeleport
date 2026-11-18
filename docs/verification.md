@@ -67,3 +67,22 @@ Maven clean verify subsequently passed 69 tests, including preference
 commands, missing beds, the global override and existing persistence tests.
 Live checks were read-only. In-game death, restart and join-message acceptance
 remain pending.
+
+## 1.2.12 home persistence audit fixes
+
+The three regression cases failed on the previous implementation. A delayed
+async save removed the second home, malformed YAML had no backup, and reload
+lost the in-memory home after a failed write. The existing-format fixture
+passed before the changes.
+
+The home writer now serializes file replacement and discards superseded
+requests and callbacks. Failed writes stay pending. Reload checks home
+persistence before changing the rest of the plugin state. Strict YAML
+loading preserves malformed input in a separate backup before replacement.
+
+Java 21 Maven clean verify passed 74 tests with zero failures, errors or
+skips. The tests cover both blocking and asynchronous write failure, preserve
+existing home fields and owner identity across a save and reload, and verify
+the existing bed file bytes, bed lookup and completed import marker. Tests
+used temporary fixture files. Production installation and in-game acceptance
+remain pending.

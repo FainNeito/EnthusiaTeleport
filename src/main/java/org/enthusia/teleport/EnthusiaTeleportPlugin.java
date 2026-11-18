@@ -133,6 +133,9 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
     }
 
     public void reloadPlugin() {
+        if (!homeManager.reloadSafely()) {
+            throw new IllegalStateException("Reload stopped while saving or reading homes.yml. Current homes remain in memory.");
+        }
         newcomerRtpNotice.clear();
         saveAllDataBlocking();
         adminLogManager.flushBlocking();
@@ -142,7 +145,6 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
         pluginConfigManager.reload();
         messages.reload();
         ignoreManager.reload();
-        homeManager.reload();
         // beds.yml is live runtime state, not configuration. Keeping the same manager generation
         // across /eteleport reload also prevents an older asynchronous save callback from being
         // applied to freshly reset persistence counters and lets the one-time vanilla import finish.
