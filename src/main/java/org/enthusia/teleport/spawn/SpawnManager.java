@@ -75,6 +75,7 @@ public class SpawnManager implements Listener {
         if (settings.firstJoinKitEnabled()) {
             giveStarterKit(player, settings);
         }
+        new org.enthusia.teleport.rtp.SurvivalOnboarding(plugin).firstJoin(player);
     }
 
     private void giveStarterKit(Player player, PluginConfig.SpawnSettings settings) {

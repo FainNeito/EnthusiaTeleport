@@ -70,8 +70,23 @@ public record PluginConfig(
             int maxAttempts,
             QueueSettings queue,
             SpacingSettings spacing,
-            SafetySettings safety
+            SafetySettings safety,
+            NewcomerRtpSettings newcomer
     ) {
+        // Retained binary/source compatibility constructor; replacing it would break existing callers.
+        @SuppressWarnings("PMD.ExcessiveParameterList")
+        public RtpSettings(boolean enabled, String world, int minX, int maxX, int minZ, int maxZ,
+                           int maxUsesDefault, Map<String, Integer> rankLimits, int maxAttempts,
+                           QueueSettings queue, SpacingSettings spacing, SafetySettings safety) {
+            this(enabled, world, minX, maxX, minZ, maxZ, maxUsesDefault, rankLimits,
+                    maxAttempts, queue, spacing, safety, new NewcomerRtpSettings(false, 3, 86400));
+        }
+    }
+
+    public record NewcomerRtpSettings(boolean enabled, int maxUses, long windowSeconds, boolean bossBarEnabled) {
+        public NewcomerRtpSettings(boolean enabled, int maxUses, long windowSeconds) {
+            this(enabled, maxUses, windowSeconds, true);
+        }
     }
 
     public record QueueSettings(
