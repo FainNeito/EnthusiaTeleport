@@ -107,3 +107,8 @@ The 1.2.13 baseline failed the anchor death regression. All 82 tests passed
 under Java 21 on the 1.2.14 build. Coverage includes three distinct inventory
 icons, click dispatch, tab and command name collisions, charge validation,
 and independent anchor storage. The test server reported 1.2.14 after restart.
+FainNeito bound a four-charge Nether anchor on SMP test. The homes menu
+showed the named home, bed and anchor together. Clicking the anchor and
+executing the tab-completed command from the Overworld both returned the
+player to the anchor with four charges remaining. After death in the
+Overworld, the player respawned beside the anchor with three charges left.
