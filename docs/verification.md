@@ -86,3 +86,12 @@ existing home fields and owner identity across a save and reload, and verify
 the existing bed file bytes, bed lookup and completed import marker. Tests
 used temporary fixture files. Production installation and in-game acceptance
 remain pending.
+
+## 1.2.13 personal homes menu and completion
+
+Two pre-change command tests reproduced empty personal suggestions and the
+admin-only handling of a named personal destination. The updated tests cover
+case-insensitive completion, bed permission filtering, named home and bed
+dispatch, the explicit bed selector, and opening and clicking a bed-only menu.
+Java 21 Maven clean verify passed 78 tests. The change reads existing homes and
+beds through their managers. No storage changes or migration are required.

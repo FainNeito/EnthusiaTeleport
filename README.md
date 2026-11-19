@@ -100,7 +100,7 @@ A home:
 /delhome <name>
 ```
 
-`/homes` opens the home GUI, showing each home's name, world, and coordinates. Clicking a home starts the teleport.
+`/homes` opens the home GUI, showing each home's name, world, and coordinates. Your saved bed appears as a red bed. Click a destination or type `/homes ` and press Tab to choose a saved name. If a home and bed share a name, `/homes <name>` selects the regular home and `/homes bed <name>` selects the bed. Staff can always use `/ahome <player>` to inspect another player.
 
 `/home` behaves slightly differently:
 

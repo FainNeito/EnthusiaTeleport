@@ -145,10 +145,30 @@ public class TeleportTabCompleter implements TabCompleter {
     }
 
     private List<String> tabHomes(CommandSender sender, String[] args) {
-        if (args.length != FIRST_ARGUMENT || !sender.hasPermission("enthusia.teleport.admin.homes.view")) {
-            return Collections.emptyList();
+        if (!(sender instanceof Player player) || args.length == 0) {
+            return List.of();
         }
-        return plugin.getOfflineNameCache().suggest(args[0].toLowerCase(Locale.ROOT), false);
+        boolean first = args.length == FIRST_ARGUMENT;
+        boolean explicitBed = args.length == SECOND_ARGUMENT && ignoresEqualCase(args[0], "bed");
+        if (!first && !explicitBed) {
+            return List.of();
+        }
+        String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
+        var names = new java.util.TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        if (first) {
+            plugin.getHomeManager().getHomes(player.getUniqueId()).forEach(home -> names.add(home.getName()));
+        }
+        if (player.hasPermission("enthusia.teleport.bed")) {
+            for (BedHome bed : plugin.getBedHomeManager().getBeds(player.getUniqueId())) {
+                if (!names.add(bed.getName()) && first) {
+                    names.add("bed"); // /homes bed <name> selects a bed sharing a regular home's name.
+                }
+            }
+        }
+        if (first && player.hasPermission("enthusia.teleport.admin.homes.view")) {
+            names.addAll(plugin.getOfflineNameCache().suggest(prefix, false));
+        }
+        return names.stream().filter(name -> name.toLowerCase(Locale.ROOT).startsWith(prefix)).toList();
     }
 
     private List<String> tabDelHome(CommandSender sender, String[] args) {

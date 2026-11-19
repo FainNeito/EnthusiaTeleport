@@ -189,7 +189,11 @@ public class BedCommand implements CommandExecutor, Listener {
         }
     }
 
-    private boolean teleportNamedBed(Player player, String name) {
+    public boolean teleportNamedBed(Player player, String name) {
+        if (!player.hasPermission("enthusia.teleport.bed")) {
+            plugin.getMessages().send(player, "generic.no-permission");
+            return true;
+        }
         if (isOverLimit(player)) {
             sendOverLimit(player);
             return true;
