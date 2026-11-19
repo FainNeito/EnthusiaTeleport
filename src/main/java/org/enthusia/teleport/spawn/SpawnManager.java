@@ -67,9 +67,9 @@ public class SpawnManager implements Listener {
         }
 
         if (event.getRespawnReason() == PlayerRespawnEvent.RespawnReason.DEATH
-                && event.isBedSpawn() && !event.isMissingRespawnBlock() && !event.isAnchorSpawn()
+                && (event.isBedSpawn() || event.isAnchorSpawn()) && !event.isMissingRespawnBlock()
                 && !prefersServerSpawn(event.getPlayer())) {
-            // Paper has already found a safe place beside the player's active bed.
+            // Paper has already found a safe place beside the player's active respawn block.
             return;
         }
 

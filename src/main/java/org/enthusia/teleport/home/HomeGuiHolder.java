@@ -10,7 +10,9 @@ public class HomeGuiHolder implements InventoryHolder {
 
     private final UUID owner;
 
-    record Destination(String name, String world, double x, double y, double z, boolean bed) {}
+    enum Kind { HOME, BED, ANCHOR }
+
+    record Destination(String name, String world, double x, double y, double z, Kind kind) {}
     final List<Destination> visible;
     final int page;
     final boolean hasNext;
