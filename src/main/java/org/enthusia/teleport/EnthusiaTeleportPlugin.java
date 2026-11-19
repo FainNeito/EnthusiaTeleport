@@ -55,6 +55,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
     private IgnoreManager ignoreManager;
     private HomeManager homeManager;
     private BedHomeManager bedHomeManager;
+    private BedCommand bedCommand;
     private BackManager backManager;
     private TeleportManager teleportManager;
     private TeleportRequestManager requestManager;
@@ -231,7 +232,8 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
         getCommand("delhome").setExecutor(new DelHomeCommand(this));
         getCommand("delhome").setTabCompleter(tabCompleter);
 
-        getCommand("bed").setExecutor(new BedCommand(this));
+        bedCommand = new BedCommand(this);
+        getCommand("bed").setExecutor(bedCommand);
         getCommand("bed").setTabCompleter(tabCompleter);
 
         getCommand("spawn").setExecutor(new SpawnCommand(this));
@@ -297,6 +299,10 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
 
     public HomeManager getHomeManager() {
         return homeManager;
+    }
+
+    public BedCommand getBedCommand() {
+        return bedCommand;
     }
 
     public BedHomeManager getBedHomeManager() {
