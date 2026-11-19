@@ -4,6 +4,8 @@ import com.destroystokyo.paper.event.player.PlayerSetSpawnEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.command.Command;
@@ -15,9 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -31,10 +31,8 @@ import org.enthusia.teleport.util.Messages;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -43,6 +41,7 @@ import java.util.UUID;
  */
 public class BedCommand implements CommandExecutor, Listener {
 
+    private static final NamespacedKey BED_TIP_SEEN = new NamespacedKey("enthusiateleport", "bed_tip_seen");
     private static final int BED_ITEMS_PER_PAGE = 45;
     private static final int PREVIOUS_PAGE_SLOT = 45;
     private static final int INFO_SLOT = 49;
@@ -51,7 +50,6 @@ public class BedCommand implements CommandExecutor, Listener {
     private static final int CANCEL_DELETE_SLOT = 15;
 
     private final EnthusiaTeleportPlugin plugin;
-    private final Map<UUID, BedBlockKey> recentBedInteractions = new HashMap<>();
 
     public BedCommand(EnthusiaTeleportPlugin plugin) {
         this.plugin = plugin;
@@ -76,6 +74,7 @@ public class BedCommand implements CommandExecutor, Listener {
             BedHome mostRecent = beds.getMostRecentBed(player.getUniqueId());
             if (mostRecent == null) {
                 sendOrFallback(msg, player, "bed.not-set", "&cYou do not have a bed home set.");
+                msg.send(player, "bed.setup-tip");
                 return true;
             }
             teleportToBed(player, mostRecent);
@@ -91,22 +90,6 @@ public class BedCommand implements CommandExecutor, Listener {
             case "help" -> showUsage(player);
             default -> teleportNamedBed(player, args[0]);
         };
-    }
-
-    /**
-     * Capture the exact bed block the player interacted with so PlayerSetSpawnEvent can distinguish
-     * sleeping in the already-saved bed from attempting to save a different bed.
-     */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBedEnter(PlayerBedEnterEvent event) {
-        BedBlockKey key = canonicalBed(event.getBed());
-        if (key == null) {
-            return;
-        }
-
-        UUID playerId = event.getPlayer().getUniqueId();
-        recentBedInteractions.put(playerId, key);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> recentBedInteractions.remove(playerId, key), 10L);
     }
 
     /**
@@ -126,7 +109,9 @@ public class BedCommand implements CommandExecutor, Listener {
             return;
         }
 
-        BedBlockKey interacted = recentBedInteractions.remove(player.getUniqueId());
+        // Paper sets the respawn point before PlayerBedEnterEvent is fired, so the spawn event
+        // itself must be the source of truth for which physical bed is being used.
+        BedBlockKey interacted = canonicalBed(event.getLocation().getBlock());
         if (!BedAccessPolicy.isOverLimit(homes)
                 && interacted != null
                 && BedAccessPolicy.matchesOnlySavedBed(
@@ -152,15 +137,20 @@ public class BedCommand implements CommandExecutor, Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (player.isOnline() && isOverLimit(player)) {
+            if (!player.isOnline()) {
+                return;
+            }
+            if (isOverLimit(player)) {
                 sendOverLimit(player);
+            } else if (player.hasPermission("enthusia.teleport.bed")
+                    && !player.getPersistentDataContainer().has(BED_TIP_SEEN, PersistentDataType.BYTE)) {
+                plugin.getMessages().send(player, "bed.setup-tip");
+                if (plugin.getPluginConfigManager().current().spawn().respawnOverrideEnabled()) {
+                    plugin.getMessages().send(player, "respawn.help");
+                }
+                player.getPersistentDataContainer().set(BED_TIP_SEEN, PersistentDataType.BYTE, (byte) 1);
             }
         }, 20L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent event) {
-        recentBedInteractions.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -199,7 +189,11 @@ public class BedCommand implements CommandExecutor, Listener {
         }
     }
 
-    private boolean teleportNamedBed(Player player, String name) {
+    public boolean teleportNamedBed(Player player, String name) {
+        if (!player.hasPermission("enthusia.teleport.bed")) {
+            plugin.getMessages().send(player, "generic.no-permission");
+            return true;
+        }
         if (isOverLimit(player)) {
             sendOverLimit(player);
             return true;
@@ -333,6 +327,8 @@ public class BedCommand implements CommandExecutor, Listener {
     }
 
     private boolean showUsage(Player player) {
+        plugin.getMessages().send(player, "bed.setup-tip");
+        plugin.getMessages().send(player, "respawn.help");
         player.sendMessage(plugin.getMessages().color("&e/bed &7- teleport to your saved bed"));
         player.sendMessage(plugin.getMessages().color("&e/bed <name> &7- teleport to a named legacy bed"));
         player.sendMessage(plugin.getMessages().color("&e/bed list &7- list saved beds and coordinates"));

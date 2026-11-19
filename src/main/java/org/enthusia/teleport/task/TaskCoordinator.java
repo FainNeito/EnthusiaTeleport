@@ -34,6 +34,7 @@ public class TaskCoordinator {
         });
 
         scheduleRepeating("rtp-queue", 1L, 1L, () -> plugin.getRtpManager().tickQueue());
+        scheduleRepeating("newcomer-rtp-notice", 20L, 20L, () -> plugin.getNewcomerRtpNotice().tick());
 
         if (config.lastLocationBackstop().repairEnabled()) {
             long intervalTicks = Math.max(1, config.lastLocationBackstop().intervalMinutes()) * 60L * 20L;

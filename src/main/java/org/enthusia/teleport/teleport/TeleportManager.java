@@ -254,6 +254,14 @@ public final class TeleportManager implements TeleportApi, Listener {
         startTeleport(player, target, useSafeSearch, anchor, warmupKey, onSuccess, TeleportFlags.standard());
     }
 
+    /** Revalidates an RTP-specific destination at instant execution or warmup completion. */
+    public void startTeleportGuarded(Player player, Location target, boolean useSafeSearch, Player anchor,
+                                     String warmupKey, Runnable onSuccess,
+                                     java.util.function.Predicate<Location> destinationAllowed) {
+        startTeleport(player, () -> destinationAllowed.test(target) ? target : null,
+                useSafeSearch, anchor, warmupKey, onSuccess, TeleportFlags.standard());
+    }
+
     public void startTeleport(Player player,
                               Location target,
                               boolean useSafeSearch,
