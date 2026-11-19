@@ -36,6 +36,13 @@ class SpawnManagerTest {
     }
 
     @Test
+    void deathAtChargedAnchorKeepsVanillaDestination() {
+        when(event.isAnchorSpawn()).thenReturn(true);
+        manager.onRespawn(event);
+        verify(event, never()).setRespawnLocation(any());
+    }
+
+    @Test
     void deathWithoutAUsableBedUsesConfiguredSpawn() {
         manager.onRespawn(event);
         verify(event).setRespawnLocation(spawn);

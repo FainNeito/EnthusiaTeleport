@@ -47,6 +47,12 @@ import java.io.File;
 
 public class EnthusiaTeleportPlugin extends JavaPlugin {
 
+    private final org.enthusia.teleport.home.AnchorHomeManager anchorHomes = new org.enthusia.teleport.home.AnchorHomeManager(this);
+
+    public org.enthusia.teleport.home.AnchorHomeManager getAnchorHomes() {
+        return anchorHomes;
+    }
+
     private static EnthusiaTeleportPlugin instance;
 
     private PluginConfigManager pluginConfigManager;
@@ -274,6 +280,7 @@ public class EnthusiaTeleportPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(combatManager, this);
         Bukkit.getPluginManager().registerEvents(homeGuiManager, this);
         Bukkit.getPluginManager().registerEvents(bedHomeManager, this);
+        Bukkit.getPluginManager().registerEvents(anchorHomes, this);
         Bukkit.getPluginManager().registerEvents(inventoryViewCommand, this);
         Bukkit.getPluginManager().registerEvents(spawnManager, this);
         Bukkit.getPluginManager().registerEvents(lastLocationManager, this);

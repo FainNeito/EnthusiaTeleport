@@ -52,14 +52,17 @@ public final class HomeGuiManager implements Listener {
         List<HomeGuiHolder.Destination> destinations = new ArrayList<>();
         for (Home home : hm.getHomes(player.getUniqueId())) {
             destinations.add(new HomeGuiHolder.Destination(home.getName(), home.getWorldName(),
-                    home.getX(), home.getY(), home.getZ(), false));
+                    home.getX(), home.getY(), home.getZ(), HomeGuiHolder.Kind.HOME));
         }
         if (player.hasPermission("enthusia.teleport.bed")) {
             for (BedHome bed : plugin.getBedHomeManager().getBeds(player.getUniqueId())) {
                 destinations.add(new HomeGuiHolder.Destination(bed.getName(), bed.getWorldName(),
-                        bed.getBedX(), bed.getBedY(), bed.getBedZ(), true));
+                        bed.getBedX(), bed.getBedY(), bed.getBedZ(), HomeGuiHolder.Kind.BED));
             }
         }
+        plugin.getAnchorHomes().available(player).ifPresent(anchor -> destinations.add(
+                new HomeGuiHolder.Destination("Respawn anchor", anchor.getWorld().getName(),
+                        anchor.getBlockX(), anchor.getBlockY(), anchor.getBlockZ(), HomeGuiHolder.Kind.ANCHOR)));
         if (destinations.isEmpty()) {
             msg.send(player, "home.no-homes");
             return;
@@ -74,10 +77,14 @@ public final class HomeGuiManager implements Listener {
         int size = inventorySizeFor(destinations.size());
         Inventory inv = Bukkit.createInventory(holder, size, msg.color(msg.rawOr("home.gui.title", "&2Your Homes")));
         for (var destination : holder.visible) {
-            ItemStack item = new ItemStack(destination.bed() ? Material.RED_BED : Material.OAK_DOOR);
+            ItemStack item = new ItemStack(switch (destination.kind()) {
+                case HOME -> Material.OAK_DOOR;
+                case BED -> Material.RED_BED;
+                case ANCHOR -> Material.RESPAWN_ANCHOR;
+            });
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                String label = destination.bed() ? "Bed home: " + destination.name() : destination.name();
+                String label = destination.kind() == HomeGuiHolder.Kind.BED ? "Bed home: " + destination.name() : destination.name();
                 meta.setDisplayName(ChatColor.GREEN + label);
                 meta.setLore(List.of(ChatColor.GRAY + "World: " + ChatColor.YELLOW + destination.world(),
                         ChatColor.GRAY + String.format("X: %s Y: %s Z: %s", formatCoordinate(destination.x()),
@@ -339,10 +346,10 @@ public final class HomeGuiManager implements Listener {
         if (slot < 0 || slot >= size) return;
         if (slot < holder.visible.size()) {
             var destination = holder.visible.get(slot);
-            if (destination.bed()) {
-                plugin.getBedCommand().teleportNamedBed(player, destination.name());
-            } else {
-                teleportToHome(player, destination.name(), false);
+            switch (destination.kind()) {
+                case BED -> plugin.getBedCommand().teleportNamedBed(player, destination.name());
+                case HOME -> teleportToHome(player, destination.name(), false);
+                case ANCHOR -> plugin.getAnchorHomes().teleport(player);
             }
         } else if (holder.page > 0 && slot == size - INVENTORY_ROW_SIZE) {
             openHomeGui(player, holder.page - 1);

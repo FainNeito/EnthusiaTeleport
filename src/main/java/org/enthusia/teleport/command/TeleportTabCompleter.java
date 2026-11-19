@@ -150,6 +150,10 @@ public class TeleportTabCompleter implements TabCompleter {
         }
         boolean first = args.length == FIRST_ARGUMENT;
         boolean explicitBed = args.length == SECOND_ARGUMENT && ignoresEqualCase(args[0], "bed");
+        if (args.length == SECOND_ARGUMENT && ignoresEqualCase(args[0], "anchor")
+                && plugin.getAnchorHomes().available(player).isPresent()) {
+            return filterOptions(List.of("respawn"), args[1].toLowerCase(Locale.ROOT));
+        }
         if (!first && !explicitBed) {
             return List.of();
         }
@@ -164,6 +168,9 @@ public class TeleportTabCompleter implements TabCompleter {
                     names.add("bed"); // /homes bed <name> selects a bed sharing a regular home's name.
                 }
             }
+        }
+        if (first && "anchor".startsWith(prefix) && plugin.getAnchorHomes().available(player).isPresent()) {
+            names.add("anchor");
         }
         if (first && player.hasPermission("enthusia.teleport.admin.homes.view")) {
             names.addAll(plugin.getOfflineNameCache().suggest(prefix, false));

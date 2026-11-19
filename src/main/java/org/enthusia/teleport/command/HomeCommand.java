@@ -79,6 +79,10 @@ public class HomeCommand implements CommandExecutor {
             return;
         }
 
+        if (args.length == 2 && ignoresEqualCase(args[0], "anchor") && ignoresEqualCase(args[1], "respawn")) {
+            plugin.getAnchorHomes().teleport(player);
+            return;
+        }
         if (args.length == 2 && ignoresEqualCase(args[0], "bed")) {
             plugin.getBedCommand().teleportNamedBed(player, args[1]);
             return;
@@ -96,6 +100,10 @@ public class HomeCommand implements CommandExecutor {
         if (player.hasPermission("enthusia.teleport.bed")
                 && plugin.getBedHomeManager().getBed(player.getUniqueId(), name) != null) {
             plugin.getBedCommand().teleportNamedBed(player, name);
+            return;
+        }
+        if (ignoresEqualCase(name, "anchor") && plugin.getAnchorHomes().available(player).isPresent()) {
+            plugin.getAnchorHomes().teleport(player);
             return;
         }
         if (!player.hasPermission("enthusia.teleport.admin.homes.view")) {

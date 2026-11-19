@@ -95,3 +95,15 @@ case-insensitive completion, bed permission filtering, named home and bed
 dispatch, the explicit bed selector, and opening and clicking a bed-only menu.
 Java 21 Maven clean verify passed 78 tests. The change reads existing homes and
 beds through their managers. No storage changes or migration are required.
+
+## 1.2.14 independent anchor home
+
+A successful charged respawn-anchor binding records one personal anchor in
+player persistent data. A later bed binding leaves that anchor available.
+The active vanilla respawn block controls death unless the player opts into
+server spawn. Named homes and bed homes keep their existing formats and limits.
+
+The 1.2.13 baseline failed the anchor death regression. All 82 tests passed
+under Java 21 on the 1.2.14 build. Coverage includes three distinct inventory
+icons, click dispatch, tab and command name collisions, charge validation,
+and independent anchor storage. The test server reported 1.2.14 after restart.
