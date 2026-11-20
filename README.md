@@ -72,7 +72,7 @@ When a request is accepted, the player who is actually moving goes through the n
 /tpignore list
 ```
 
-`/tpacancel` cancels outgoing request(s). `/tpignore` can ignore or unignore teleport requests from a particular player, and the ignore list persists across restarts.
+`/tpacancel` cancels outgoing request(s). `/tpignore` can ignore or unignore teleport requests from a known player even while they are offline. Run the same command again to unblock them. The ignore list persists across restarts.
 
 ## Homes
 

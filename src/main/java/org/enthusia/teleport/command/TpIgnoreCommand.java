@@ -56,15 +56,17 @@ public class TpIgnoreCommand implements CommandExecutor {
 
         // /tpignore <player>
         String targetName = args[0];
-        Player target = Bukkit.getPlayerExact(targetName);
-        if (target == null || !target.isOnline()) {
-            // reuse existing message
-            msg.send(player, "teleport.request.player-not-found",
+        OfflinePlayer target = Bukkit.getPlayerExact(targetName);
+        if (target == null) {
+            target = Bukkit.getOfflinePlayerIfCached(targetName);
+        }
+        if (target == null || (!target.isOnline() && !target.hasPlayedBefore())) {
+            msg.send(player, "ignore.unknown-player",
                     Map.of("target", targetName));
             return true;
         }
 
-        if (target.equals(player)) {
+        if (target.getUniqueId().equals(player.getUniqueId())) {
             msg.send(player, "teleport.request.to-self");
             return true;
         }
@@ -77,11 +79,8 @@ public class TpIgnoreCommand implements CommandExecutor {
 
         ignoreMgr.setIgnoring(receiverId, senderId, nowIgnoring);
 
-        if (nowIgnoring) {
-            msg.send(player, "ignore.toggle-on", Map.of("target", target.getName()));
-        } else {
-            msg.send(player, "ignore.toggle-off", Map.of("target", target.getName()));
-        }
+        String displayName = target.getName() == null ? targetName : target.getName();
+        msg.send(player, nowIgnoring ? "ignore.toggle-on" : "ignore.toggle-off", Map.of("target", displayName));
 
         return true;
     }

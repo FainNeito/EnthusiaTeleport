@@ -112,3 +112,11 @@ showed the named home, bed and anchor together. Clicking the anchor and
 executing the tab-completed command from the Overworld both returned the
 player to the anchor with four charges remaining. After death in the
 Overworld, the player respawned beside the anchor with three charges left.
+
+## 1.2.15 offline teleport-request blocking
+
+Both new regressions failed on 1.2.14. The command rejected a known offline
+player and completion omitted that name. On 1.2.15, the command resolves a
+cached local profile, checks that the offline player has joined, and toggles
+the existing UUID-based ignore record. Unknown names create no record.
+Java 21 Maven clean verify passed all 84 tests. Verification was local.

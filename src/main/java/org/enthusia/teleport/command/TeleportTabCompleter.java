@@ -92,30 +92,19 @@ public class TeleportTabCompleter implements TabCompleter {
     }
 
     private List<String> tabTpIgnore(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            return Collections.emptyList();
+        if (!(sender instanceof Player player) || args.length != FIRST_ARGUMENT) {
+            return List.of();
         }
-
-        if (args.length == FIRST_ARGUMENT) {
-            String prefix = args[0].toLowerCase(Locale.ROOT);
-            List<String> suggestions = new ArrayList<>();
-
-            if ("list".startsWith(prefix)) {
-                suggestions.add("list");
-            }
-
-            suggestions.addAll(
-                    Bukkit.getOnlinePlayers().stream()
-                            .map(Player::getName)
-                            .filter(n -> n.toLowerCase(Locale.ROOT).startsWith(prefix))
-                            .sorted(String.CASE_INSENSITIVE_ORDER)
-                            .collect(Collectors.toList())
-            );
-
-            return suggestions;
+        String prefix = args[0].toLowerCase(Locale.ROOT);
+        var names = new java.util.TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        names.addAll(plugin.getOfflineNameCache().suggest(prefix, false));
+        Bukkit.getOnlinePlayers().stream().map(Player::getName)
+                .filter(name -> name.toLowerCase(Locale.ROOT).startsWith(prefix)).forEach(names::add);
+        names.remove(player.getName());
+        if ("list".startsWith(prefix)) {
+            names.add("list");
         }
-
-        return Collections.emptyList();
+        return List.copyOf(names);
     }
 
     private List<String> tabHome(CommandSender sender, String[] args) {

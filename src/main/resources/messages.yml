@@ -72,6 +72,7 @@ teleport.denied-requester: "&c{target} denied your teleport request."
 teleport.cancelled-requester: "&aYou cancelled your pending teleport request(s)."
 teleport.cancelled-target: "&e{sender}&c cancelled their teleport request."
 
+ignore.unknown-player: "&cNo known player matches &e{target}&c on this server."
 ignore.toggle-on: "&eYou will now &cignore &eteleport requests from &6{target}&e."
 ignore.toggle-off: "&eYou will now &areceive &ateleport requests from &6{target}&e."
 ignore.list-header: "&6You are ignoring teleport requests from:"
