@@ -47,7 +47,13 @@ public final class NewcomerRtpNotice implements Listener {
             return;
         }
         int limit = plugin.getRtpManager().getLimit(player);
-        int remaining = Math.max(0, limit - plugin.getRtpManager().getUses(player.getUniqueId()));
+        int used = plugin.getRtpManager().getUses(player.getUniqueId());
+        int remaining = Math.max(0, limit - used);
+        // Stay quiet on first join: show the bar only once the player has actually used /rtp.
+        if (used == 0) {
+            remove(player.getUniqueId());
+            return;
+        }
         if (limit >= 0 && remaining == 0) {
             remove(player.getUniqueId());
             return;
